@@ -60,7 +60,7 @@ const House = props => {
                 <p>
                   ${(numberOfNightsBetweenDates * props.house.price).toFixed(2)}
                 </p>
-                <button class='reserve'>Reserve</button>
+                <button className='reserve'>Reserve</button>
               </div>
             )}
           </aside>
@@ -75,17 +75,6 @@ const House = props => {
             aside {
               border: 1px solid #ccc;
               padding: 20px;
-            }
-
-            button {
-              background-color: rgb(255, 90, 95);
-              color: white;
-              font-size: 13px;
-              width: 100%;
-              border: none;
-              height: 40px;
-              border-radius: 4px;
-              cursor: pointer;
             }
           `}</style>
         </div>
