@@ -1,4 +1,5 @@
 import { useStoreState, useStoreActions } from 'easy-peasy'
+import Head from 'next/head'
 
 import Header from './Header'
 import Modal from './Modal'
@@ -22,6 +23,10 @@ const Layout = props => {
 
   return (
     <div>
+      <Head>
+        <script src='https://js.stripe.com/v3/'></script>
+      </Head>
+
       <Header />
       <main>{props.content}</main>
 
