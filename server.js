@@ -221,7 +221,7 @@ nextApp.prepare().then(() => {
     return !(results.length > 0)
   }
 
-  server.get('/api/houses/check', async (req, res) => {
+  server.post('/api/houses/check', async (req, res) => {
     const startDate = req.body.startDate
     const endDate = req.body.endDate
     const houseId = req.body.houseId
@@ -237,7 +237,7 @@ nextApp.prepare().then(() => {
     })
   })
 
-  server.get('/api/houses/booked', async (req, res) => {
+  server.post('/api/houses/booked', async (req, res) => {
     const houseId = req.body.houseId
 
     const results = await Booking.findAll({
