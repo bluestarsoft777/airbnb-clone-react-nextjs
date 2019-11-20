@@ -196,7 +196,6 @@ nextApp.prepare().then(() => {
     })
   })
 
-  /**/
   const getDatesBetweenDates = (startDate, endDate) => {
     let dates = []
     while (startDate < endDate) {
@@ -206,6 +205,37 @@ nextApp.prepare().then(() => {
     dates = [...dates, endDate]
     return dates
   }
+
+  const canBookThoseDates = async (houseId, startDate, endDate) => {
+    const results = await Booking.findAll({
+      where: {
+        houseId: houseId,
+        startDate: {
+          [Op.lte]: new Date(endDate)
+        },
+        endDate: {
+          [Op.gte]: new Date(startDate)
+        }
+      }
+    })
+    return !(results.length > 0)
+  }
+
+  server.get('/api/houses/check', async (req, res) => {
+    const startDate = req.body.startDate
+    const endDate = req.body.endDate
+    const houseId = req.body.houseId
+
+    let message = 'free'
+    if (!(await canBookThoseDates(houseId, startDate, endDate))) {
+      message = 'busy'
+    }
+
+    res.json({
+      status: 'success',
+      message: message
+    })
+  })
 
   server.get('/api/houses/booked', async (req, res) => {
     const houseId = req.body.houseId
@@ -233,17 +263,28 @@ nextApp.prepare().then(() => {
     //remove duplicates
     bookedDates = [...new Set(bookedDates.map(date => date))]
 
-    res.writeHead(200, {
-      'Content-Type': 'application/json'
+    res.json({
+      status: 'success',
+      message: 'ok',
+      dates: bookedDates
     })
+  })
 
-    res.end(
-      JSON.stringify({
-        status: 'success',
-        message: 'ok',
-        dates: bookedDates
+  server.post('/api/houses/reserve', (req, res) => {
+    const userEmail = req.session.passport.user
+    User.findOne({ where: { email: userEmail } }).then(user => {
+      Booking.create({
+        houseId: req.body.houseId,
+        userId: user.id,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate
+      }).then(() => {
+        res.writeHead(200, {
+          'Content-Type': 'application/json'
+        })
+        res.end(JSON.stringify({ status: 'success', message: 'ok' }))
       })
-    )
+    })
   })
 
   server.get('/api/houses/:id', (req, res) => {
