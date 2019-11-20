@@ -39,6 +39,25 @@ const getBookedDates = async houseId => {
   }
 }
 
+const canReserve = async (houseId, startDate, endDate) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:3000/api/houses/check',
+      { houseId, startDate, endDate }
+    )
+    if (response.data.status === 'error') {
+      alert(response.data.message)
+      return
+    }
+
+    if (response.data.message === 'busy') return false
+    return true
+  } catch (error) {
+    console.error(error)
+    return
+  }
+}
+
 const House = props => {
   const [numberOfNightsBetweenDates, setNumberOfNightsBetweenDates] = useState(
     0
@@ -108,6 +127,13 @@ const House = props => {
                   <button
                     className='reserve'
                     onClick={async () => {
+                      if (
+                        !(await canReserve(props.house.id, startDate, endDate))
+                      ) {
+                        alert('The dates chosen are not valid')
+                        return
+                      }
+
                       try {
                         const response = await axios.post(
                           '/api/houses/reserve',
