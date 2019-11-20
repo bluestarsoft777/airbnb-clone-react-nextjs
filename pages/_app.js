@@ -17,7 +17,6 @@ function MyApp({ Component, pageProps, user }) {
 MyApp.getInitialProps = async appContext => {
   // calls page's `getInitialProps` and fills `appProps.pageProps`
   const appProps = await App.getInitialProps(appContext)
-
   let user = null
   if (
     appContext.ctx.req &&
