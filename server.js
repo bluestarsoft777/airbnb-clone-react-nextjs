@@ -25,6 +25,8 @@ Booking.sync({ alter: true })
 
 const sequelize = require('./database.js')
 
+const Op = require('sequelize').Op
+
 const sessionStore = new SequelizeStore({
   db: sequelize
 })
@@ -192,6 +194,56 @@ nextApp.prepare().then(() => {
         res.end(JSON.stringify({ status: 'success', message: 'ok' }))
       })
     })
+  })
+
+  /**/
+  const getDatesBetweenDates = (startDate, endDate) => {
+    let dates = []
+    while (startDate < endDate) {
+      dates = [...dates, new Date(startDate)]
+      startDate.setDate(startDate.getDate() + 1)
+    }
+    dates = [...dates, endDate]
+    return dates
+  }
+
+  server.get('/api/houses/booked', async (req, res) => {
+    const houseId = req.body.houseId
+
+    const results = await Booking.findAll({
+      where: {
+        houseId: houseId,
+        endDate: {
+          [Op.gte]: new Date()
+        }
+      }
+    })
+
+    let bookedDates = []
+
+    for (const result of results) {
+      const dates = getDatesBetweenDates(
+        new Date(result.startDate),
+        new Date(result.endDate)
+      )
+
+      bookedDates = [...bookedDates, ...dates]
+    }
+
+    //remove duplicates
+    bookedDates = [...new Set(bookedDates.map(date => date))]
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json'
+    })
+
+    res.end(
+      JSON.stringify({
+        status: 'success',
+        message: 'ok',
+        dates: bookedDates
+      })
+    )
   })
 
   server.get('/api/houses/:id', (req, res) => {
