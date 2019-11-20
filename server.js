@@ -13,8 +13,15 @@ const bodyParser = require('body-parser')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 
-const User = require('./model.js').User
-const sequelize = require('./model.js').sequelize
+const User = require('./models/user.js')
+const House = require('./models/house.js')
+const Review = require('./models/review.js')
+
+User.sync({ alter: true })
+House.sync({ alter: true })
+Review.sync({ alter: true })
+
+const sequelize = require('./database.js')
 
 const sessionStore = new SequelizeStore({
   db: sequelize
