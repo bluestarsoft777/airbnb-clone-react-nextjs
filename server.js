@@ -16,10 +16,12 @@ const LocalStrategy = require('passport-local').Strategy
 const User = require('./models/user.js')
 const House = require('./models/house.js')
 const Review = require('./models/review.js')
+const Booking = require('./models/booking.js')
 
 User.sync({ alter: true })
 House.sync({ alter: true })
 Review.sync({ alter: true })
+Booking.sync({ alter: true })
 
 const sequelize = require('./database.js')
 
@@ -173,6 +175,23 @@ nextApp.prepare().then(() => {
     req.logout()
     req.session.destroy()
     return res.end(JSON.stringify({ status: 'success', message: 'Logged out' }))
+  })
+
+  server.post('/api/houses/reserve', (req, res) => {
+    const userEmail = req.session.passport.user
+    User.findOne({ where: { email: userEmail } }).then(user => {
+      Booking.create({
+        houseId: req.body.houseId,
+        userId: user.id,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate
+      }).then(() => {
+        res.writeHead(200, {
+          'Content-Type': 'application/json'
+        })
+        res.end(JSON.stringify({ status: 'success', message: 'ok' }))
+      })
+    })
   })
 
   server.get('/api/houses/:id', (req, res) => {

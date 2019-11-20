@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-unfetch'
+import axios from 'axios'
 import { useState } from 'react'
-import { useStoreActions } from 'easy-peasy'
+import { useStoreActions, useStoreState } from 'easy-peasy'
 
 import Head from 'next/head'
 import Layout from '../../components/Layout'
@@ -24,10 +25,14 @@ const House = props => {
     0
   )
   const [dateChosen, setDateChosen] = useState(false)
+  const [startDate, setStartDate] = useState()
+  const [endDate, setEndDate] = useState()
 
   const setShowLoginModal = useStoreActions(
     actions => actions.modals.setShowLoginModal
   )
+
+  const user = useStoreState(state => state.user.user)
 
   return (
     <Layout
@@ -67,6 +72,8 @@ const House = props => {
                   calcNumberOfNightsBetweenDates(startDate, endDate)
                 )
                 setDateChosen(true)
+                setStartDate(startDate)
+                setEndDate(endDate)
               }}
             />
             {dateChosen && (
@@ -77,13 +84,40 @@ const House = props => {
                 <p>
                   ${(numberOfNightsBetweenDates * props.house.price).toFixed(2)}
                 </p>
-                <button
-                  className='reserve'
-                  onClick={() => {
-                    setShowLoginModal()
-                  }}>
-                  Reserve
-                </button>
+                {user ? (
+                  <button
+                    className='reserve'
+                    onClick={async () => {
+                      try {
+                        const response = await axios.post(
+                          '/api/houses/reserve',
+                          {
+                            houseId: props.house.id,
+                            startDate,
+                            endDate
+                          }
+                        )
+                        if (response.data.status === 'error') {
+                          alert(response.data.message)
+                          return
+                        }
+                        console.log(response.data)
+                      } catch (error) {
+                        console.log(error)
+                        return
+                      }
+                    }}>
+                    Reserve
+                  </button>
+                ) : (
+                  <button
+                    className='reserve'
+                    onClick={() => {
+                      setShowLoginModal()
+                    }}>
+                    Log in to Reserve
+                  </button>
+                )}
               </div>
             )}
           </aside>
