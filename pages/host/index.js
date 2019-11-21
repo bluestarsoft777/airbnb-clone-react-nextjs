@@ -47,7 +47,7 @@ const Host = props => {
               <div className='list'>
                 {props.bookings.map((booking, index) => {
                   return (
-                    <div class='booking' key={index}>
+                    <div className='booking' key={index}>
                       <div>
                         <h2>
                           {booking.house.title} in {booking.house.town}
