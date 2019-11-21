@@ -111,14 +111,21 @@ const HouseForm = props => {
           />
         </p>
         <p>
-          <label>House picture URL</label>
+          <label>House picture</label>
           <input
-            required
-            onChange={event => setPicture(event.target.value)}
-            type='text'
-            placeholder='House picture URL'
-            value={picture}
+            type='file'
+            id='fileUpload'
+            accept='image/*'
+            onChange={async event => {
+              const files = event.target.files
+              const formData = new FormData()
+              formData.append('image', files[0])
+
+              const response = await axios.post('/api/host/image', formData)
+              setPicture('http://localhost:3000' + response.data.path)
+            }}
           />
+          {picture ? <img src={picture} width='200' alt='House image' /> : ''}
         </p>
         <div>
           <label>House description</label>
@@ -239,6 +246,7 @@ const HouseForm = props => {
 
       <style jsx>{`
         input[type='number'],
+        input[type='file'],
         select,
         textarea {
           display: block;
