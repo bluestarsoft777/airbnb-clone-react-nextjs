@@ -2,6 +2,7 @@ const express = require('express')
 const next = require('next')
 const dotenv = require('dotenv')
 dotenv.config()
+const sanitizeHtml = require('sanitize-html')
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
@@ -587,6 +588,9 @@ nextApp.prepare().then(() => {
     const userEmail = req.session.passport.user
     User.findOne({ where: { email: userEmail } }).then(user => {
       houseData.host = user.id
+      houseData.description = sanitizeHtml(houseData.description, {
+        allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br']
+      })
 
       House.create(houseData).then(() => {
         res.writeHead(200, {
@@ -631,6 +635,9 @@ nextApp.prepare().then(() => {
 
             return
           }
+          houseData.description = sanitizeHtml(houseData.description, {
+            allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br']
+          })
 
           House.update(houseData, {
             where: {

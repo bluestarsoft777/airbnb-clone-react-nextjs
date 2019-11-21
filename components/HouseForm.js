@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import axios from 'axios'
 import Router from 'next/router'
+import Editor from 'react-pell'
 
 const HouseForm = props => {
   const id = (props.house && props.house.id) || null
@@ -119,13 +120,14 @@ const HouseForm = props => {
             value={picture}
           />
         </p>
-        <p>
+        <div>
           <label>House description</label>
-          <textarea
-            required
-            onChange={event => setDescription(event.target.value)}
-            value={description}></textarea>
-        </p>
+          <Editor
+            onChange={html => setDescription(html)}
+            defaultContent={description}
+            actions={['bold', 'underline', 'italic']}
+          />
+        </div>
 
         <div className='grid'>
           <div>
@@ -259,6 +261,39 @@ const HouseForm = props => {
 
         .grid > div {
           padding: 50px;
+        }
+      `}</style>
+
+      <style jsx global>{`
+        .pell-container {
+          border: 1px solid #ccc;
+        }
+        .pell,
+        .pell-content {
+          box-sizing: border-box;
+        }
+        .pell-content {
+          height: 300px;
+          outline: 0;
+          overflow-y: auto;
+          padding: 10px;
+        }
+        .pell-actionbar {
+          background-color: #fff;
+          border-bottom: 1px solid hsla(0, 0%, 4%, 0.1);
+        }
+        .pell-button {
+          background-color: transparent;
+          border: none;
+          cursor: pointer;
+          height: 30px;
+          outline: 0;
+          width: 30px;
+          vertical-align: bottom;
+          color: black;
+        }
+        .pell-button-selected {
+          background-color: #f0f0f0;
         }
       `}</style>
     </div>
